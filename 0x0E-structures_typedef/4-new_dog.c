@@ -1,36 +1,41 @@
+#include "dog.h"
 #include <stdlib.h>
 #include <string.h>
-#include "main.h"
 
-dog_t *new_dog(char *name, float age, char *owner) {
-    /* Allocate memory for the dog struct */
-    dog_t *new_dog = malloc(sizeof(dog_t));
-    if (new_dog == NULL) {
-        return NULL; /* return NULL if malloc fails */
-    }
-    
-    /* Allocate memory for the name string */
-    new_dog->name = malloc(strlen(name) + 1); /* +1 for the null terminator */
-    if (new_dog->name == NULL) {
-        free(new_dog);
-        return NULL; /* free the previously allocated memory and return NULL if malloc fails */
-    }
-    
-    /* Allocate memory for the owner string */
-    new_dog->owner = malloc(strlen(owner) + 1); /* +1 for the null terminator */
-    if (new_dog->owner == NULL) {
-        free(new_dog->name);
-        free(new_dog);
-        return NULL; /* free the previously allocated memory and return NULL if malloc fails */
-    }
-    
-    /* Copy the name and owner strings to the new memory locations */
-    strcpy(new_dog->name, name);
-    strcpy(new_dog->owner, owner);
-    
-    /* Set the age of the dog */
-    new_dog->age = age;
-    
-    return new_dog;
+/**
+ * new_dog - Create a new dog
+ * @name: Name of the new dog
+ * @age: Age of the new dog
+ * @owner: Owner of the new dog
+ *
+ * Return: Pointer to the new dog, or NULL if the function fails
+ */
+
+dog_t *new_dog(char *name, float age, char *owner)
+{
+	dog_t *new_dog;
+
+	new_dog = malloc(sizeof(dog_t));
+	if (new_dog == NULL)
+		return (NULL);
+
+	new_dog->name = strdup(name);
+	if (new_dog->name == NULL)
+	{
+		free(new_dog);
+		return (NULL);
+	}
+
+	new_dog->age = age;
+
+	new_dog->owner = strdup(owner);
+	if (new_dog->owner == NULL)
+	{
+		free(new_dog->name);
+		free(new_dog);
+		return (NULL);
+	}
+
+	return (new_dog);
 }
 
