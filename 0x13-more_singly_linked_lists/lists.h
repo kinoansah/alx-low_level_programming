@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 /*
- * Description: Header file for thee More singly linked list project
+ * Description: Header file for More singly linked list
  * contains functions and prototypes used
  */
 
