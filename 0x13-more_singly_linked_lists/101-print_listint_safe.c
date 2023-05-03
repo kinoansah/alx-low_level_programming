@@ -6,6 +6,7 @@
  *
  * Return: Number of nodes in the list
  */
+
 size_t print_listint_safe(const listint_t *head)
 {
 	const listint_t *node = head, *node2 = head;
