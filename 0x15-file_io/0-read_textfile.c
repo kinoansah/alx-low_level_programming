@@ -1,60 +1,51 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "main.h"
 
 /**
  * read_textfile - reads a text file and prints it to the POSIX standard output
+ * @filename: pointer to the file name
+ * @letters: number of letters it should read and print
  *
- * @filename: the name of the file to read
- * @letters: the number of letters to read and print
- *
- * Return: the actual number of letters read and printed, or 0 on failure
+ * Return: actual number of letters it could read and print or 0 if it fails
  */
+
 ssize_t read_textfile(const char *filename, size_t letters)
 {
-	/* Check for NULL filename */
+	int fd; /* file descriptor */
+	ssize_t to_read, to_write;
+	char *buffer;  /* Buffer to store text */
+
+	/* Check if the filename is NULL */
 	if (filename == NULL)
-	{
 		return (0);
-	}
 
-	/* Attempt to open file for reading */
-	FILE *file = fopen(filename, "r");
-	if (file == NULL)
-	{
+	/* open file to read and store and store fd */
+	fd = open(filename, O_RDONLY);
+	if (fd == -1)
 		return (0);
-	}
 
-	/* Allocate buffer for file contents */
-	char *buffer = (char*) malloc(sizeof(char) * letters);
+	/* Allocating malloc to buffer */
+	buffer = malloc(sizeof(char) * letters);
 	if (buffer == NULL)
-	{
-		fclose(file);
 		return (0);
-	}
 
-	/* Read up to letters characters from file into buffer */
-	ssize_t bytes_read = fread(buffer, sizeof(char), letters, file);
-	if (bytes_read == -1)
+	/* read from file and stores number of bytes read */
+	to_read = read(fd, buffer, letters);
+	if (to_read == -1)
 	{
-		fclose(file);
 		free(buffer);
+		close(fd);
 		return (0);
 	}
 
-	/* Write buffer contents to standard output */
-	ssize_t bytes_written = write(STDOUT_FILENO, buffer, bytes_read);
-	if (bytes_written == -1 || bytes_written != bytes_read)
+	/* write standard output and store the number of bytes written */
+	to_write = write(STDOUT_FILENO, buffer, to_read);
+	if (to_write == -1)
 	{
-		fclose(file);
 		free(buffer);
+		close(fd);
 		return (0);
 	}
-
-	/* Clean up and return number of bytes read */
-	fclose(file);
-	free(buffer);
-
-	return (bytes_read);
+	close(fd);
+	return (to_read);
 }
 
