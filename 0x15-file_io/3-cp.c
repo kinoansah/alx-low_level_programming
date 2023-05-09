@@ -1,70 +1,52 @@
 #include "main.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#define BUFFER_SIZE 1024
 
 /**
- * main - copies the content of a file to another file.
+ * main - copies the content of a file to another file
+ * @argc: number of arguments passed to the program
+ * @argv: array of arguments
  *
- * @argc: The number of arguments supplied to the program.
- * @argv: An array of pointers to the arguments.
- *
- * Return: 0 on success.
+ * Return: Always 0 (Success)
  */
 int main(int argc, char *argv[])
 {
-	int fd_from, fd_to, num_read, num_written;
-	char buffer[BUFFER_SIZE];
+	int fd_r, fd_w, r, a, b;
+	char buffer[BUFSIZ];
 
 	if (argc != 3)
 	{
-		printf("Usage: %s file_from file_to\n", argv[0]);
-		exit(EXIT_FAILURE);
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
+		exit(97);
 	}
-
-	fd_from = open(argv[1], O_RDONLY);
-	if (fd_from == -1)
+	fd_r = open(argv[1], O_RDONLY);
+	if (fd_r < 0)
 	{
-		perror("Error opening file_from");
-		exit(EXIT_FAILURE);
+		dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+		exit(98);
 	}
-
-	fd_to = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd_to == -1)
+	fd_w = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
+	while ((r = read(fd_r, buffer, BUFSIZ)) > 0)
 	{
-		perror("Error opening file_to");
-		exit(EXIT_FAILURE);
-	}
-
-	while ((num_read = read(fd_from, buffer, BUFFER_SIZE)) > 0)
-	{
-		num_written = write(fd_to, buffer, num_read);
-		if (num_written == -1 || num_written != num_read)
+		if (fd_w < 0 || write(fd_w, buffer, r) != r)
 		{
-			perror("Error writing to file_to");
-			close(fd_from);
-			close(fd_to);
-			exit(EXIT_FAILURE);
+			dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
+			close(fd_r);
+			exit(99);
 		}
 	}
-
-	if (num_read == -1)
+	if (r < 0)
 	{
-		perror("Error reading from file_from");
-		close(fd_from);
-		close(fd_to);
-		exit(EXIT_FAILURE);
+		dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+		exit(98);
 	}
-
-	if (close(fd_from) == -1 || close(fd_to) == -1)
+	a = close(fd_r);
+	b = close(fd_w);
+	if (a < 0 || b < 0)
 	{
-		perror("Error closing file descriptors");
-		exit(EXIT_FAILURE);
+		if (a < 0)
+			dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", fd_r);
+		if (b < 0)
+			dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", fd_w);
+		exit(100);
 	}
-
-	exit(EXIT_SUCCESS);
+	return (0);
 }
-
