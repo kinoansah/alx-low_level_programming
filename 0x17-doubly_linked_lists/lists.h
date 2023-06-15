@@ -1,7 +1,9 @@
 #ifndef LISTS_H
 #define LISTS_H
 
-/* Structures */
+#include <stddef.h> /* for size_t and NULL */
+
+/* Structure for doubly list nodes */
 typedef struct dlistint_s
 {
 	int n;
