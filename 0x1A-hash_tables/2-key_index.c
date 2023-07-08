@@ -12,11 +12,12 @@
  */
 unsigned long int key_index(const unsigned char *key, unsigned long int size)
 {
-	/* Assuming a hash_djb2 function in directory */
-	unsigned long int hash_value = hash_djb2(key);
+	unsigned long int hash;
 
-	/* Calculate the index by taking the modulo of the hash value with the size */
-	unsigned long int index = size > 0 ? hash_value % size : 0;
+	if (size == 0)
+		return (0);
 
-	return (index);
+	hash = hash_djb2(key);
+
+	return (hash % size);
 }
