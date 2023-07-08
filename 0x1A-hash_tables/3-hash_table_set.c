@@ -2,101 +2,97 @@
 #include <string.h>
 #include <stdio.h>
 #include "hash_tables.h"
-
 /**
- * create_hash_node - Creates a new hash node
- * @key: The key
- * @value: The value
- *
- * Return: A pointer to the new hash node, or NULL on failure
+ * replace_value - Replaces the value of a key in a hash table.
+ * @ht: The hash table.
+ * @key: The key to search for.
+ * @value: The new value to assign.
  */
-hash_node_t *create_hash_node(const char *key, const char *value)
+void replace_value(hash_node_t **ht, const char *key, const char *value)
 {
-	hash_node_t *new_node = malloc(sizeof(hash_node_t));
+	hash_node_t *temp = *ht;
 
-	if (new_node == NULL)
-		return (NULL);
+	while (temp && strcmp(temp->key, key))
+		temp = temp->next;
 
-	new_node->key = strdup(key);
-
-	if (new_node->key == NULL)
-	{
-		free(new_node);
-		return (NULL);
-	}
-
-	new_node->value = strdup(value);
-	if (new_node->value == NULL)
-	{
-		free(new_node->key);
-		free(new_node);
-		return (NULL);
-	}
-
-	new_node->next = NULL;
-
-	return (new_node);
+	free(temp->value);
+	temp->value = strdup(value);
 }
 
 /**
- * update_hash_node_value - Updates the value of an existing hash node
- * @node: The hash node
- * @value: The new value
+ * check_key - Checks if a key exists in a hash table.
+ * @ht: The hash table.
+ * @key: The key to search for.
  *
- * Return: 1 on success, 0 on failure
+ * Return: 1 if the key exists, 0 otherwise.
  */
-int update_hash_node_value(hash_node_t *node, const char *value)
+int check_key(hash_node_t *ht, const char *key)
 {
-	char *new_value = strdup(value);
-
-	if (new_value == NULL)
-		return (0);
-
-	free(node->value);
-	node->value = new_value;
-	return (1);
+	while (ht)
+	{
+		if (!strcmp(ht->key, key))
+			return (1);
+		ht = ht->next;
+	}
+	return (0);
 }
 
 /**
- * hash_table_set - Adds or updates an element in the hash table
- * @ht: The hash table
- * @key: The key
- * @value: The value associated with the key
+ * add_node - Adds a new node to a hash table.
+ * @head: The head of the linked list.
+ * @key: The key for the new node.
+ * @value: The value for the new node.
  *
- * Return: 1 on success, 0 on failure
+ * Return: The updated head of the linked list.
  */
-int hash_table_set(hash_table_t *ht, const char *key, const char *value)
+hash_node_t *add_node(hash_node_t **head, const char *key, const char *value)
 {
-	hash_node_t *new_node;
-	unsigned long int index;
-	hash_node_t *current;
+	hash_node_t *new;
 
-	if (ht == NULL || key == NULL)
-		return (0);
-	index = key_index((const unsigned char *)key, ht->size);
+	new = malloc(sizeof(hash_node_t));
+	if (!new)
+		return (NULL);
 
-	current = ht->array[index];
-	while (current != NULL)
+	new->key = strdup(key);
+	new->value = strdup(value);
+
+	if (*head == NULL)
 	{
-		if (strcmp(current->key, key) == 0)
-			return (update_hash_node_value(current, value));
-
-		current = current->next;
-	}
-
-	new_node = create_hash_node(key, value);
-	if (new_node == NULL)
-		return (0);
-
-	if (ht->array[index] == NULL)
-	{
-		ht->array[index] = new_node;
+		(*head) = new;
+		new->next = NULL;
 	}
 	else
 	{
-		new_node->next = ht->array[index];
-		ht->array[index] = new_node;
+		new->next = (*head);
+		(*head) = new;
 	}
+	return (*head);
+}
 
+/**
+ * hash_table_set - Adds or updates a key-value pair in a hash table.
+ * @ht: The hash table.
+ * @key: The key to add or update.
+ * @value: The value associated with the key.
+ *
+ * Return: 1 if successful, 0 otherwise.
+ */
+int hash_table_set(hash_table_t *ht, const char *key, const char *value)
+{
+	unsigned long int index;
+
+	if (!ht || !key || !strcmp(key, "") || !value)
+		return (0);
+
+	index = key_index((unsigned char *)key, ht->size);
+
+	if (check_key(ht->array[index], key))
+	{
+		replace_value(&ht->array[index], key, value);
+		return (1);
+	}
+	add_node(&ht->array[index], key, value);
+	if (&ht->array[index] == NULL)
+		return (0);
 	return (1);
 }
