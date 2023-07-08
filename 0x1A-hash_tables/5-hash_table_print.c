@@ -4,23 +4,20 @@
 #include "hash_tables.h"
 
 /**
- * hash_table_print - function that prints a hash table
- * @ht: hash table
- *
- *Return: 0, ht is NULL
+ * hash_table_print - Prints the key-value pairs in a hash table.
+ * @ht: The hash table to print.
  */
 void hash_table_print(const hash_table_t *ht)
 {
-	unsigned long int i;
 	unsigned char comma_flag;
+	unsigned long int i;
 
-	/* Check if the hash table is valid */
 	if (ht == NULL)
 		return;
 
+	comma_flag = 0;
 	printf("{");
-	comma_flag = 0;	/* Flag to track comma printing */
-	/* Print the array elements */
+
 	for (i = 0; i < ht->size; i++)
 	{
 		hash_node_t *node = ht->array[i];
@@ -34,6 +31,5 @@ void hash_table_print(const hash_table_t *ht)
 			node = node->next;
 		}
 	}
-
 	printf("}\n");
 }
