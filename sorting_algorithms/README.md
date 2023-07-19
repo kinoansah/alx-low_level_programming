@@ -14,4 +14,16 @@ Write a function that sorts an array of integers in ascending order using the Bu
 
 1. Insertion sort
 
+Write a function that sorts a doubly linked list in integers in ascending order using the Insertion sort algorithm
 
+2. Selection sort
+
+Write a function that sorts an array of integers in ascending order using the Selection sort algorithm
+
+3. Quick sort
+
+Write a function that sorts an array of integers in ascending order using the Quick sort algorithm
+
+# advanced tasks
+
+4. 
